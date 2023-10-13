@@ -5,35 +5,51 @@ from flask_restx import fields
 from . import api
 
 
-user_response_model = api.model("UserResponse", {
-  "id": fields.Integer(readonly=True, description="User ID"),
-  "username": fields.String(required=True, description="Username")
+register_response_model = api.model("Register Response", {
+  "id": fields.Integer(description="User ID"),
+  "username": fields.String(description="User Username"),
+  "email": fields.String(description="User Email")
 })
 
-user_model = api.model("User", {
-  "username": fields.String(required=True, description="Username"),
-  "password": fields.String(required=True, description="Password")
+login_response_model = api.model("Login Response", {
+  "token": fields.String(description="User Token")
 })
 
-student_response_model = api.model("StudentResponse", {
-  "id": fields.Integer(readonly=True, description="Student ID"),
-  "name": fields.String(required=True, description="Student Name"),
-  # "course": fields.Nested(course_response_model)
+student_response_model = api.model("Student Response", {
+  "id": fields.Integer(description="Student ID"),
+  "name": fields.String(description="Student Name"),
+  "courses": fields.List(fields.Nested(api.model("Nested Course", {
+    "id": fields.Integer(description="Course ID"),
+    "name": fields.String(description="Course Name")
+  })))
+})
+
+course_response_model = api.model("Course Response", {
+  "id": fields.Integer(description="Course ID"),
+  "name": fields.String(description="Course Name"),
+  "students": fields.List(fields.Nested(api.model("Nested Student", {
+    "id": fields.Integer(description="Student ID"),
+    "name": fields.String(description="Student Name")
+  })))
+})
+
+register_model = api.model("Register", {
+  "username": fields.String(required=True, description="User Username"),
+  "email": fields.String(required=True, description="User Email"),
+  "password": fields.String(required=True, description="User password")
+})
+
+login_model = api.model("Login", {
+  "username": fields.String(required=True, description="User Username"),
+  "password": fields.String(required=True, description="User password")
 })
 
 student_model = api.model("Student", {
-  "id": fields.Integer(readonly=True, description="Student ID"),
-  "name": fields.String(required=True, description="Student Name"),
-  "course_id": fields.Integer(required=True, description="Course ID"),
+  "name": fields.String(required=True, description="Student Name")
 })
 
-course_response_model = api.model("CourseResponse", {
-  "id": fields.Integer(readonly=True, description="Course ID"),
-  "name": fields.String(required=True, description="Course Name"),
-  "students": fields.List(fields.Nested(student_response_model))
-})
 
 course_model = api.model("Course", {
-  "id": fields.Integer(readonly=True, description="Course ID"),
   "name": fields.String(required=True, description="Course Name"),
+  "student_ids": fields.List(fields.Integer(required=False, description="Student IDs"))
 })
