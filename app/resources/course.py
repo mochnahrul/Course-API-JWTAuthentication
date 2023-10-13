@@ -26,7 +26,12 @@ class CourseList(Resource):
     """Add a new course."""
     name = api.payload["name"]
     student_ids = api.payload["student_ids"]
-    
+
+    # check if the name is already in use
+    existing_course_name = Course.query.filter_by(name=name).first()
+    if existing_course_name:
+      api.abort(400, "Course with this name is already in use by another course")
+
     new_course = Course(name=name)
 
     # query for the students with the specified IDs
@@ -58,8 +63,15 @@ class CourseResource(Resource):
     if not course:
       api.abort(404, "Course with ID {} not found".format(id))
 
-    if "name" in api.payload:
-      course.name = api.payload["name"]
+    # check if a new name is provided and if it is already in use by another course
+    new_name = api.payload.get("name")
+    if new_name:
+      existing_course_name = Course.query.filter_by(name=new_name).first()
+      if existing_course_name and existing_course_name.id != id:
+        api.abort(400, "Course with this name is already in use by another course")
+
+      course.name = new_name
+
     # update associated students
     if "student_ids" in api.payload:
       student_ids = api.payload["student_ids"]
@@ -72,10 +84,8 @@ class CourseResource(Resource):
   def delete(self, id):
     """Delete courses by ID."""
     course = Course.query.get(id)
-
     if not course:
       api.abort(404, "Course with ID {} not found".format(id))
-
     db.session.delete(course)
     db.session.commit()
     return "", 204

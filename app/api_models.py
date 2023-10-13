@@ -48,7 +48,6 @@ student_model = api.model("Student", {
   "name": fields.String(required=True, description="Student Name")
 })
 
-
 course_model = api.model("Course", {
   "name": fields.String(required=True, description="Course Name"),
   "student_ids": fields.List(fields.Integer(required=False, description="Student IDs"))
