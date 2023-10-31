@@ -8,7 +8,7 @@ from ..models import Student
 from ..api_models import student_response_model, student_model
 
 
-student_ns = Namespace("Student", path="/students", description="Operations about Student", authorizations=authorizations)
+student_ns = Namespace("Student", path="/student", description="Operations about Student", authorizations=authorizations)
 
 @student_ns.route("")
 @student_ns.doc(security="jsonWebToken")

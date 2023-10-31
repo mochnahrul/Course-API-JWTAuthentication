@@ -8,7 +8,7 @@ from ..models import Course, Student
 from ..api_models import course_response_model, course_model
 
 
-course_ns = Namespace("Course", path="/courses", description="Operations about Course", authorizations=authorizations)
+course_ns = Namespace("Course", path="/course", description="Operations about Course", authorizations=authorizations)
 
 @course_ns.route("")
 @course_ns.doc(security="jsonWebToken")
