@@ -17,22 +17,18 @@ class Register(Resource):
   @auth_ns.marshal_with(register_response_model, code=201)
   def post(self):
     """Create an account."""
-    username = api.payload["username"]
-    email = api.payload["email"]
-
     # check if the username is already in use
-    existing_user_username = User.query.filter_by(username=username).first()
+    existing_user_username = User.query.filter_by(username=api.payload["username"]).first()
     if existing_user_username:
       api.abort(400, "Username is already in use")
 
     # check if the email is already in use
-    existing_user_email = User.query.filter_by(email=email).first()
+    existing_user_email = User.query.filter_by(email=api.payload["email"]).first()
     if existing_user_email:
       api.abort(400, "Email is already in use")
 
     # hash the password
-    password = api.payload["password"]
-    api.payload["password"] = generate_password_hash(password)
+    api.payload["password"] = generate_password_hash(api.payload["password"])
 
     new_user = User(**api.payload)
     db.session.add(new_user)
@@ -52,7 +48,7 @@ class Login(Resource):
       api.abort(401, "Incorrect password")
 
     access_token = create_access_token(user.username)
-    user.token = access_token
+    user.token = "Bearer " + access_token
 
     db.session.commit()
     return user, 201

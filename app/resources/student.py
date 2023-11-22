@@ -24,12 +24,10 @@ class StudentList(Resource):
   @student_ns.marshal_with(student_response_model, code=201)
   def post(self):
     """Add a new student."""
-    name = api.payload["name"]
-
     # check if the name is already in use
-    existing_student_name = Student.query.filter_by(name=name).first()
+    existing_student_name = Student.query.filter_by(name=api.payload["name"]).first()
     if existing_student_name:
-      api.abort(400, "Student with this name is already in use by another student")
+      api.abort(400, "Name is already in use")
 
     new_student = Student(**api.payload)
     db.session.add(new_student)
@@ -56,19 +54,15 @@ class StudentResource(Resource):
     if not student:
       api.abort(404, "Student with ID {} not found".format(id))
 
-    # check if a new name is provided and if it is already in use by another student
-    new_name = api.payload.get("name")
-    if new_name:
-      existing_student_name = Student.query.filter_by(name=new_name).first()
-      if existing_student_name and existing_student_name.id != id:
-        api.abort(400, "Student with this name is already in use by another student")
-
-      student.name = new_name
+    # check if the new name is already in use
+    existing_student_name = Student.query.filter_by(name=api.payload["name"]).first()
+    if existing_student_name and existing_student_name.id != id:
+      api.abort(400, "Name is already in use")
+    student.name = api.payload["name"]
 
     db.session.commit()
     return student
 
-  @student_ns.doc(responses={204: "Student deleted"})
   def delete(self, id):
     """Delete students by ID."""
     student = Student.query.get(id)
