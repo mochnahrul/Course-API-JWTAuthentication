@@ -1,5 +1,5 @@
 # third-party imports
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -32,6 +32,10 @@ def create_app(config=DevelopmentConfig):
   api.add_namespace(auth_ns)
   api.add_namespace(student_ns)
   api.add_namespace(course_ns)
+
+  @jwt.unauthorized_loader
+  def custom_error_message(callback):
+    return jsonify({"message": "Unauthorized access"}), 401
 
   with app.app_context():
     db.create_all()

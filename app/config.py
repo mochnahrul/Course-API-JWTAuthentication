@@ -5,6 +5,7 @@ class Config(object):
   SECRET_KEY = "this-really-needs-to-be-changed"
   SQLALCHEMY_DATABASE_URI = "sqlite:///courses.db"
   SQLALCHEMY_TRACK_MODIFICATIONS = False
+  RESTX_ERROR_404_HELP = False
 
 class ProductionConfig(Config):
   DEBUG = False
