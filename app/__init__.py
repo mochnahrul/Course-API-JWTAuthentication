@@ -1,5 +1,6 @@
 # third-party imports
-from flask import Flask, jsonify
+import json
+from flask import Flask
 from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -35,7 +36,12 @@ def create_app(config=DevelopmentConfig):
 
   @jwt.unauthorized_loader
   def custom_error_message(callback):
-    return jsonify({"message": "Unauthorized access"}), 401
+    response = {
+      "status": 401,
+      "message": "Unauthorized access",
+      "data": None
+    }
+    return json.dumps(response), 401, {"Content-Type": "application/json"}
 
   with app.app_context():
     db.create_all()

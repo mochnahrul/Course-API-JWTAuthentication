@@ -18,15 +18,14 @@ class Register(Resource):
   @auth_ns.expect(register_model)
   def post(self):
     """Create an account."""
-    # check if the username is already in use
+    # check if the username is already registered
     existing_user_username = User.query.filter_by(username=api.payload["username"]).first()
     if existing_user_username:
-      return generate_response(400, "Username is already in use"), 400
-
-    # check if the email is already in use
+      return generate_response(400, "Username is already registered"), 400
+    # check if the email is already registered
     existing_user_email = User.query.filter_by(email=api.payload["email"]).first()
     if existing_user_email:
-      return generate_response(400, "Email is already in use"), 400
+      return generate_response(400, "Email is already registered"), 400
 
     # hash the password
     api.payload["password"] = generate_password_hash(api.payload["password"])
@@ -37,14 +36,14 @@ class Register(Resource):
     return generate_response(201, "Account created successful", api.marshal(new_user, register_response_model)), 201
 
 @auth_ns.route("/login")
-@api.doc(responses={200: "OK", 401: "Unauthorized"})
+@api.doc(responses={200: "OK", 400: "Bad Request", 401: "Unauthorized"})
 class Login(Resource):
   @auth_ns.expect(login_model)
   def post(self):
-    """Log in to get an access token."""
+    """Log in to your account."""
     user = User.query.filter_by(username=api.payload["username"]).first()
     if not user:
-      return generate_response(401, "User does not exist"), 401
+      return generate_response(401, "Username is not registered"), 401
     if not check_password_hash(user.password, api.payload["password"]):
       return generate_response(401, "Incorrect password"), 401
 

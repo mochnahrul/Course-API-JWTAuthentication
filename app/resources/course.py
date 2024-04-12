@@ -12,7 +12,7 @@ from ..utils import generate_response
 course_ns = Namespace("Course", path="/course", description="Operations about Course", authorizations=authorizations)
 
 @course_ns.route("")
-@course_ns.doc(responses={200: "OK", 201: "Created", 400: "Bad Request"}, security="jsonWebToken")
+@course_ns.doc(responses={200: "OK", 201: "Created", 400: "Bad Request", 401: "Unauthorized", 500: "Internal Server Error"}, security="jsonWebToken")
 class CourseList(Resource):
   method_decorators = [jwt_required()]
   def get(self):
@@ -39,7 +39,7 @@ class CourseList(Resource):
     return generate_response(201, "Course created successful", api.marshal(new_course, course_response_model)), 201
 
 @course_ns.route("/<int:id>")
-@course_ns.doc(responses={200: "OK", 204: "No Content", 400: "Bad Request", 404: "Not Found"}, params={"id": "Course ID"}, security="jsonWebToken")
+@course_ns.doc(responses={200: "OK", 204: "No Content", 400: "Bad Request", 401: "Unauthorized", 404: "Not Found", 500: "Internal Server Error"}, params={"id": "Course ID"}, security="jsonWebToken")
 class CourseResource(Resource):
   method_decorators = [jwt_required()]
   def get(self, id):
